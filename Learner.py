@@ -2,8 +2,11 @@ __author__ = 'philippe'
 import World
 import threading
 import time
+import numpy as np
 
 discount = 0.3
+gamma = 0.5 # Initial probability
+gamma_decay = 0.9 # Exploration/exploitation tradeoff
 actions = World.actions
 states = []
 Q = {}
@@ -60,6 +63,7 @@ def inc_Q(s, a, alpha, inc):
 
 def run():
     global discount
+    global gamma
     time.sleep(1)
     alpha = 1
     t = 1
@@ -67,6 +71,14 @@ def run():
         # Pick the right action
         s = World.player
         max_act, max_val = max_Q(s)
+
+        # Exploration/Exploitation tradeoff
+        if np.random.rand(1) <= gamma:
+            max_act = np.random.choice(["up", "down", "left", "right"])
+            # print max_act
+
+        print gamma
+
         (s, a, r, s2) = do_action(max_act)
 
         # Update Q
@@ -77,6 +89,7 @@ def run():
         t += 1.0
         if World.has_restarted():
             World.restart_game()
+            gamma *= gamma_decay
             time.sleep(0.01)
             t = 1.0
 
