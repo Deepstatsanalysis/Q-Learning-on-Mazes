@@ -102,8 +102,8 @@ def run():
         # Update the learning rate
         alpha = pow(t, -0.1)
 
-        # MODIFY THIS SLEEP IF THE GAME IS GOING TOO FAST.
-        time.sleep(0.1)
+        # Reduce sleep time to get results faster
+        time.sleep(0.01)
 
 
 t = threading.Thread(target=run)
