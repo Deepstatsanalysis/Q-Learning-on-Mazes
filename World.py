@@ -7,17 +7,68 @@ triangle_size = 0.1
 cell_score_min = -0.2
 cell_score_max = 0.2
 Width = 20
-(x, y) = (5, 5)
+(x, y) = (25, 25)
 actions = ["up", "down", "left", "right"]
 
+red_blocks = 5
+green_blocks = 5
 board = Canvas(master, width=x*Width, height=y*Width)
-player = (np.random.choice([0, x-1]), np.random.choice([0, y-1]))
 score = 1
 restart = False
 walk_reward = -0.04
 
-walls = [(1, 1), (1, 2), (2, 1), (2, 2)]
-specials = [(4, 1, "red", -1), (4, 2, "green", 1)]
+# Perform cellular automata to generate a random grid layout
+iter_max = 50
+
+map_grid = []
+for i in range(x):
+    map_row = []
+    for j in range(y):
+        map_row.append(0)
+    map_grid.append(map_row)
+
+for i in range(1,x-1):
+    for j in range(1,y-1):
+        map_grid[i][j] = np.random.randint(2)
+
+for iter_t in range(iter_max):
+    for i in range(1,x-1):
+        for j in range(1,y-1):
+            neighbour_score = 0
+            for i1 in range(-1,2):
+                for j1 in range(-1,2):
+                    if i1 != 0 or j1 != 0 and map_grid[i+i1][j+j1] == 1:
+                        neighbour_score += 1
+            if map_grid[i][j] == 1 and (neighbour_score < 2 or neighbour_score > 3):
+                map_grid[i][j] = 0
+            if map_grid[i][j] == 1 and neighbour_score >= 2 and neighbour_score <= 3:
+                map_grid[i][j] = 1
+            if map_grid[i][j] == 0 and neighbour_score == 3:
+                map_grid[i][j] = 1
+
+walls = []
+for i in range(0,x):
+    for j in range(0,y):
+        if map_grid[i][j] == 1:
+            walls.append((i,j))
+
+# Randomly initilaize player where there is no wall
+player = (np.random.randint(x), np.random.randint(y))
+while map_grid[player[0]][player[1]] == 1:
+    player = (np.random.randint(x), np.random.randint(y))
+
+specials = []
+for i in range(red_blocks):
+    gen_pos = (np.random.randint(x), np.random.randint(y))
+    while map_grid[gen_pos[0]][gen_pos[1]] == 1:
+        gen_pos = (np.random.randint(x), np.random.randint(y))
+    specials.append((gen_pos[0], gen_pos[1], "red", -1))
+for i in range(green_blocks):
+    gen_pos = (np.random.randint(x), np.random.randint(y))
+    while map_grid[gen_pos[0]][gen_pos[1]] == 1:
+         gen_pos = (np.random.randint(x), np.random.randint(y))
+    specials.append((gen_pos[0], gen_pos[1], "green", 1))
+
 cell_scores = {}
 
 
