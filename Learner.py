@@ -6,7 +6,7 @@ import numpy as np
 
 discount = 0.3
 gamma = 0.8 # Initial probability
-gamma_decay = 0.95 # Exploration/exploitation tradeoff
+gamma_decay = 0.99 # Exploration/exploitation tradeoff
 actions = World.actions
 states = []
 Q = {}
