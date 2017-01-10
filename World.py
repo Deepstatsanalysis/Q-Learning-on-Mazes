@@ -1,6 +1,7 @@
 __author__ = 'philippe'
 from Tkinter import *
 import numpy as np
+from copy import copy, deepcopy
 master = Tk()
 
 triangle_size = 0.1
@@ -10,15 +11,15 @@ Width = 20
 (x, y) = (25, 25)
 actions = ["up", "down", "left", "right"]
 
-red_blocks = 5
-green_blocks = 5
+red_blocks = 3
+green_blocks = 2
 board = Canvas(master, width=x*Width, height=y*Width)
 score = 1
 restart = False
 walk_reward = -0.04
 
 # Perform cellular automata to generate a random grid layout
-iter_max = 50
+iter_max = 7
 
 map_grid = []
 for i in range(x):
@@ -29,22 +30,23 @@ for i in range(x):
 
 for i in range(1,x-1):
     for j in range(1,y-1):
-        map_grid[i][j] = np.random.randint(2)
+        map_grid[i][j] = np.random.choice([0,1], p=[0.38, 0.62])
 
 for iter_t in range(iter_max):
+    new_map_grid = deepcopy(map_grid)
     for i in range(1,x-1):
         for j in range(1,y-1):
             neighbour_score = 0
             for i1 in range(-1,2):
                 for j1 in range(-1,2):
-                    if i1 != 0 or j1 != 0 and map_grid[i+i1][j+j1] == 1:
+                    if (i1 != 0 or j1 != 0) and map_grid[i+i1][j+j1] == 1:
                         neighbour_score += 1
-            if map_grid[i][j] == 1 and (neighbour_score < 2 or neighbour_score > 3):
-                map_grid[i][j] = 0
-            if map_grid[i][j] == 1 and neighbour_score >= 2 and neighbour_score <= 3:
-                map_grid[i][j] = 1
-            if map_grid[i][j] == 0 and neighbour_score == 3:
-                map_grid[i][j] = 1
+            # print neighbour_score
+            if neighbour_score > 4:
+                new_map_grid[i][j] = 1
+            else:
+                new_map_grid[i][j] = 0
+    map_grid = deepcopy(new_map_grid)
 
 walls = []
 for i in range(0,x):
@@ -56,6 +58,8 @@ for i in range(0,x):
 player = (np.random.randint(x), np.random.randint(y))
 while map_grid[player[0]][player[1]] == 1:
     player = (np.random.randint(x), np.random.randint(y))
+
+orig_player = deepcopy(player)
 
 specials = []
 for i in range(red_blocks):
@@ -167,7 +171,7 @@ def call_right(event):
 
 def restart_game():
     global player, score, me, restart
-    player = (0, y-1)
+    player = deepcopy(orig_player)
     score = 1
     restart = False
     board.coords(me, player[0]*Width+Width*2/10, player[1]*Width+Width*2/10, player[0]*Width+Width*8/10, player[1]*Width+Width*8/10)

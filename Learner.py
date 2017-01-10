@@ -67,7 +67,15 @@ def run():
     time.sleep(1)
     alpha = 1
     t = 1
+    # If its taking too long, then restart and try again
+    max_run_iter = 5000
+    cur_iter = 0
     while True:
+        cur_iter += 1
+        if cur_iter > max_run_iter:
+            cur_iter = 0
+            World.restart_game()
+
         # Pick the right action
         s = World.player
         max_act, max_val = max_Q(s)
@@ -76,8 +84,6 @@ def run():
         if np.random.rand(1) <= gamma:
             max_act = np.random.choice(["up", "down", "left", "right"])
             # print max_act
-
-        print gamma
 
         (s, a, r, s2) = do_action(max_act)
 
