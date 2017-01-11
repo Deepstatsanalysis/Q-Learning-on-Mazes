@@ -43,6 +43,7 @@ Run `python Learner.py` in terminal to see the the bot in action. It'll keep try
 ## Improvements for the future
 
 * Walls generated need to be filtered out to ensure that small regions are removed and small holes are covered. This can be done by performing a DFS in each region to count the number of walls/holes in each region and then remove them if needed.
+* Terrain can also be generated using 2D perlin noise (It would be interesting to compare the results of the two generation methods)
 
 ### Credits
 
